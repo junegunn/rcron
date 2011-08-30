@@ -1,9 +1,53 @@
 = rcron
 
-Description goes here.
+A simple cron-like scheduler for Ruby.
+
+== Installation
+  gem install rcron
+
+== Cron format
+As of now, most of the expressions except for ? and W are supported.
+
+http://en.wikipedia.org/wiki/Cron#Format
+
+== Examples
+
+=== Basic
+  require 'rcron'
+
+  rcron = RCron.new
+  rcron.q('runs every two minutes', '*/2 * * * *') do |task|
+    # Task logic
+    # ...
+  end
+  rcron.start
+
+=== One-time only task
+  rcron = RCron.new
+  rcron.q('will run once at 8pm next second friday', '0 8 * * fri#2') do |task|
+    # Removes the task from the queue
+    task.dq
+
+    # Task logic
+    # ...
+  end
+  rcron.start
+
+=== Options
+  rcron = RCron.new
+
+  # :exclusive - Only one instance of this task will run simultaneously.
+  # :timeout   - Task will be terminated if it takes longer than the specified seconds.
+  rcron.q('Every ten-minutes during summer', 
+          '*/10 * * jun-aug *', 
+          :exclusive => true, 
+          :timeout => 1200) do |task|
+    # Task logic
+    # ...
+  end
+  rcron.start
 
 == Contributing to rcron
- 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project

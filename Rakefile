@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "rcron"
   gem.homepage = "http://github.com/junegunn/rcron"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{A simple cron-like scheduler}
+  gem.description = %Q{A simple cron-like scheduler for Ruby}
   gem.email = "junegunn.c@gmail.com"
   gem.authors = ["Junegunn Choi"]
   # dependencies defined in Gemfile
