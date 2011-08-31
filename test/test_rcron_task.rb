@@ -18,37 +18,37 @@ class TestRcronTask < Test::Unit::TestCase
   def test_schedule
     rcron = RCron.new
     schedule = '* * * * *'
-    task = rcron.q('my name', schedule) { }
+    task = rcron.q('test_schedule', schedule) { }
     assert_equal RCron::Parser.parse(schedule), task.schedule
   end
   
   def test_rcron
     rcron = RCron.new
     schedule = '* * * * *'
-    task = rcron.q('my name', schedule) { }
+    task = rcron.q('test_rcron', schedule) { }
     assert_equal rcron, task.rcron
   end
 
   def test_timeout
     rcron = RCron.new
-    task = rcron.q('my name', '* * * * *', :timeout => 100) { }
+    task = rcron.q('test_timeout', '* * * * *', :timeout => 100) { }
     assert_equal 100, task.timeout
   end
 
   def test_exclusive
     rcron = RCron.new
-    task = rcron.q('my name', '* * * * *', :exclusive => true) { }
+    task = rcron.q('test_exclusive', '* * * * *', :exclusive => true) { }
     assert_equal true, task.exclusive?
-    task = rcron.q('my name', '* * * * *', :exclusive => false) { }
+    task = rcron.q('test_exclusive', '* * * * *', :exclusive => false) { }
     assert_equal false, task.exclusive?
-    task = rcron.q('my name', '* * * * *') { }
+    task = rcron.q('test_exclusive', '* * * * *') { }
     assert_equal false, task.exclusive?
   end
 
   def test_running
     rcron = RCron.new
     running = nil
-    task = rcron.q('my name', '* * * * *') { |t|
+    task = rcron.q('test_running', '* * * * *') { |t|
       running = t.running?
       t.dq
     }
@@ -59,7 +59,7 @@ class TestRcronTask < Test::Unit::TestCase
 
   def test_queued
     rcron = RCron.new
-    task = rcron.q('my name', '* * * * *') { }
+    task = rcron.q('test_queued', '* * * * *') { }
     assert_equal true, task.queued?
     task.dq
     assert_equal false, task.queued?
@@ -68,7 +68,8 @@ class TestRcronTask < Test::Unit::TestCase
   def test_threads
     rcron = RCron.new
     num_threads = nil
-    task = rcron.q('my name', '* * * * *') { |t|
+    task = rcron.q('test_threads', '* * * * *') { |t|
+      p t.threads
       num_threads = t.threads.length
       sleep 60 + 10
       t.dq
@@ -165,9 +166,9 @@ class TestRcronTask < Test::Unit::TestCase
       '16 17 27 aug * 2010-2012' => false,
       '16 16 L aug * 2010-2012' => false
     }.each do |sch, ass|
-      task = rcron.q('my name', sch) { }
+      task = rcron.q('test_now', sch) { }
       puts sch
-      assert_equal ass, task.now?(now)
+      assert_equal ass, task.scheduled?(now)
     end
   end
 end

@@ -1,4 +1,5 @@
 require 'rcron/task'
 require 'rcron/alarm'
 require 'rcron/parser'
+require 'rcron/timeout'
 require 'rcron/scheduler'
