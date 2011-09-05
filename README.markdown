@@ -19,8 +19,8 @@ http://en.wikipedia.org/wiki/Cron#Format
 require 'rcron'
 rcron = RCron.new
 
-# Enqueue a task
-rcron.q('runs every two minutes', '*/2 * * * *') do |task|
+# Enqueue a task running every two minutes
+rcron.q('task #1', '*/2 * * * *') do |task|
   # Task logic
   # ...
 end
@@ -33,7 +33,8 @@ rcron.start
 ### One-time only task
 ```ruby
 rcron = RCron.new
-rcron.q('will run once at 8pm next second friday', '0 8 * * fri#2') do |task|
+# will run once at 8pm next second friday
+rcron.q('task #2', '0 8 * * fri#2') do |task|
   # Removes the task from the queue
   task.dq
 
