@@ -53,10 +53,11 @@ class RCron
     end
 
     # Removes the task from the scheduler
-    def dq
+    def deq
       @queued = false
       nil
     end
+    alias dq deq
 
     # Returns if the task is supposed to be triggered at the given moment.
     # @param [Time] at

@@ -20,12 +20,12 @@ require 'rcron'
 rcron = RCron.new
 
 # Enqueue a task running every two minutes
-rcron.q('task #1', '*/2 * * * *') do |task|
+rcron.enq('task #1', '*/2 * * * *') do |task|
   # Task logic
   # ...
 end
 
-# You can `q' any number of tasks before starting rcron
+# You can `enq' any number of tasks before starting rcron
 
 rcron.start
 ```
@@ -34,9 +34,9 @@ rcron.start
 ```ruby
 rcron = RCron.new
 # will run once at 8pm next second friday
-rcron.q('task #2', '0 8 * * fri#2') do |task|
+rcron.enq('task #2', '0 8 * * fri#2') do |task|
   # Removes the task from the queue
-  task.dq
+  task.deq
 
   # Task logic
   # ...
@@ -50,7 +50,7 @@ rcron = RCron.new
 
 # :exclusive - Only one instance of this task will run simultaneously.
 # :timeout   - Task will be terminated if it takes longer than the specified seconds.
-rcron.q('Every ten-minutes during summer', 
+rcron.enq('Every ten-minutes during summer', 
         '*/10 * * jun-aug *', 
         :exclusive => true, 
         :timeout => 1200) do |task|

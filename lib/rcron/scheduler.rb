@@ -14,7 +14,7 @@ class RCron
   # @param [String] schedule Cron-format schedule string
   # @param [Hash] options Additional options for the task. :exclusive and :timeout.
   # @return [RCron::Task]
-  def q name, schedule, options = {}, &block
+  def enq name, schedule, options = {}, &block
     raise ArgumentError.new("Block not given") unless block_given?
 
     new_task = nil
@@ -26,6 +26,7 @@ class RCron
     end
     return new_task
   end
+  alias q enq
 
   # Starts the scheduler
   # @param log_output_stream Stream to output scheduler log. Should implement puts method.

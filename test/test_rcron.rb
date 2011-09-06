@@ -45,10 +45,10 @@ class TestRcron < Test::Unit::TestCase
       task.dq
     end
 
-    @task = rcron.q('basic task 2 - auto dq', "* * * * *") do
+    @task = rcron.enq('basic task 2 - auto dq', "* * * * *") do
       counter += 2
       sleep 3
-      @task.dq
+      @task.deq
     end
 
     st = Time.now
