@@ -1,4 +1,4 @@
-$LOAD_PATH << "."
+$LOAD_PATH.unshift File.dirname(__FILE__)
 require 'helper'
 
 class TestRcronParser < Test::Unit::TestCase
@@ -55,6 +55,19 @@ class TestRcronParser < Test::Unit::TestCase
                  RCron::Parser.parse('* * * */3 *')[:months])
     assert_equal({0 => true, 23 => true, 24 => true, 46 => true, 48 => true}, 
                  RCron::Parser.parse('*/23,*/24 * * * *')[:minutes])
+  end
+
+  def test_dividend_with_offset
+    assert_equal({2 => true, 7 => true, 12 => true, 17 => true}, 
+                 RCron::Parser.parse('2-20/5 * * * *')[:minutes])
+    assert_equal({2 => true, 7 => true, 12 => true, 17 => true, 45 => true, 53 => true}, 
+                 RCron::Parser.parse('2-20/5,45-59/8 * * * *')[:minutes])
+    assert_equal({2 => true, 7 => true, 12 => true, 17 => true, 45 => true, 53 => true, 1 => true, 9 => true}, 
+                 RCron::Parser.parse('2-20/5,45-10/8 * * * *')[:minutes])
+    assert_equal({4 => true, 7 => true, 10 => true},
+                 RCron::Parser.parse('* * * apr-oct/3 *')[:months])
+    assert_equal({10 => true, 1 => true, 4 => true},
+                 RCron::Parser.parse('* * * oct-jun/3 *')[:months])
   end
 
   def test_months

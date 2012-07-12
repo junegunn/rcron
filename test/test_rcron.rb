@@ -1,15 +1,27 @@
-$LOAD_PATH << "."
+$LOAD_PATH.unshift File.dirname(__FILE__)
 require 'helper'
 
 class TestRcron < Test::Unit::TestCase
-  class LogStream
+  class FakeLogger
     def initialize
       @lines = []
     end
 
-    def puts str
-      $stdout.puts str
+    def log header, str
+      $stdout.puts header + ' ' + str
       @lines << str
+    end
+
+    def info msg
+      log '[I]', msg
+    end
+
+    def warn msg
+      log '[W]', msg
+    end
+
+    def error msg
+      log '[E]', msg
     end
 
     def count pat
@@ -19,10 +31,10 @@ class TestRcron < Test::Unit::TestCase
 
   def test_empty_q
     rcron = RCron.new
-    log = LogStream.new
-    rcron.start(log)
+    logger = FakeLogger.new
+    rcron.start(logger)
 
-    assert_equal 1, log.count(/completed/)
+    assert_equal 1, logger.count(/completed/)
   end
 
   def test_blockless
@@ -108,7 +120,7 @@ class TestRcron < Test::Unit::TestCase
   def test_non_exclusive
     puts 'non exclusive'
     counter = 0
-    log = LogStream.new
+    log = FakeLogger.new
     rcron = RCron.new
     truth = true
     rcron.q('non-exclusive', '* * * * *') do |task|
@@ -127,7 +139,7 @@ class TestRcron < Test::Unit::TestCase
   def test_exclusive
     puts 'exclusive'
     counter = 0
-    log = LogStream.new
+    log = FakeLogger.new
     rcron = RCron.new
     rcron.q('exclusive', '* * * * *', :exclusive => true) do |task|
       counter += 1
@@ -161,7 +173,7 @@ class TestRcron < Test::Unit::TestCase
   end
 
   def test_exception
-    log = LogStream.new
+    log = FakeLogger.new
     rcron = RCron.new
     rcron.q('Exceptional', '* * * * *') do |task|
       task.dq

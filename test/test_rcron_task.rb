@@ -1,4 +1,4 @@
-$LOAD_PATH << "."
+$LOAD_PATH.unshift File.dirname(__FILE__)
 require 'helper'
 
 class TestRcronTask < Test::Unit::TestCase

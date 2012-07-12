@@ -9,7 +9,7 @@ class RCron
       parser = lambda { |type, min, len, element, subs, extra|
         return nil if element.nil?
 
-        max = min + len
+        max = min + len - 1
 
         (subs || {}).each do |k, v|
           element = element.gsub(/\b#{k}\b/i, v.to_s)
@@ -25,7 +25,22 @@ class RCron
             raise err if ei < min || ei > max
             ei
           when %r|^\*/([1-9][0-9]*)$|
-            (min...max).select { |m| m % $1.to_i == 0 }
+            (min..max).select { |m| m % $1.to_i == 0 }
+          when %r|^([0-9]+)-([0-9]+)/([1-9][0-9]*)$|
+            f, t = $1.to_i, $2.to_i
+            raise err if f < min || f > max
+            raise err if t < min || t > max
+
+            if f < t
+              (f..t).select { |m| (m - f) % $3.to_i == 0 }
+            else
+              (f..max).select { |m| (m - f) % $3.to_i == 0 } + 
+              (min..t).select { |m| 
+                m = m + max + 1 - min
+                (m - f) % $3.to_i == 0
+              }
+            end
+
           when %r|^([0-9]+)-([0-9]+)$|
             f, t = $1.to_i, $2.to_i
 
@@ -35,7 +50,7 @@ class RCron
             if f < t
               (f..t).to_a
             else
-              (f...max).to_a + (min..t).to_a
+              (f..max).to_a + (min..t).to_a
             end
           else
             extra && extra.call(e) || raise(err)

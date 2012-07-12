@@ -1,12 +1,16 @@
 require 'thread'
+require 'logger'
+require 'forwardable'
 
 class RCron
+  extend Forwardable
+
+  def_delegators :@logger, :info, :warn, :error
+
   def initialize
-    @tasks = []
-    @mutex = Mutex.new
+    @tasks    = []
+    @mutex    = Mutex.new
     @sleeping = false
-    @log_mutex = Mutex.new
-    @log_ostream = $stdout
   end
 
   # Enqueues a task to be run
@@ -29,16 +33,16 @@ class RCron
   alias q enq
 
   # Starts the scheduler
-  # @param log_output_stream Stream to output scheduler log. Should implement puts method.
-  def start log_output_stream = $stdout
-    raise ArgumentError.new(
-        "Log output stream should implement puts method") unless
-            log_output_stream.respond_to? :puts
+  # @param logger Logger instance. Default is a Logger to standard output.
+  def start logger = Logger.new($stdout)
+    unless [:info, :warn, :error].all? { |m| logger.respond_to? m }
+      raise ArgumentError.new("Invalid Logger")
+    end
 
-    @log_ostream = log_output_stream
+    @logger = logger
     @thread = Thread.current
 
-    log "rcron started"
+    info "rcron started"
 
     now = Time.now
     while @tasks.length > 0
@@ -68,15 +72,15 @@ class RCron
       now = Time.now
       @tasks.select { |e| e.queued? && e.scheduled?(now) }.each do |t|
         if t.running? && t.exclusive?
-          log "[#{t.name}] already running exclusively"
+          warn "[#{t.name}] already running exclusively"
           next
         end
 
-        log "[#{t.name}] started"
+        info "[#{t.name}] started"
         t.send :start, now
       end if now >= next_tick
     end#while
-    log "rcron completed"
+    info "rcron completed"
   end#start
 
   # Crontab-like tasklist
@@ -93,11 +97,5 @@ private
         @thread.raise(RCron::Alarm.new)
       end
     }
-  end
-
-  def log msg
-    @log_mutex.synchronize do
-      @log_ostream.puts "[#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}] #{msg}"
-    end
   end
 end#RCron

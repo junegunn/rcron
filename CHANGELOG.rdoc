@@ -1,6 +1,0 @@
-=== 0.1.1 / 2011/09/06
-* RCron#enq and RCron::Task#deq as aliases of q and dq
-
-=== 0.1.0 / 2011/08/31
-* Initial release
-

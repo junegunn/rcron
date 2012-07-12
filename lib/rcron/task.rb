@@ -141,11 +141,11 @@ class RCron
             task.run
             @ended_at = Time.now
 
-            task.rcron.send :log, "[#{task.name}] completed (#{'%.2f' % elapsed}s)"
+            task.rcron.send :info, "[#{task.name}] completed (#{'%.2f' % elapsed}s)"
           rescue Exception => e
             @ended_at = Time.now
 
-            task.rcron.send :log, "[#{task.name}] terminated: #{[e, e.backtrace].join($/)}"
+            task.rcron.send :error, "[#{task.name}] terminated: #{[e, e.backtrace].join($/)}"
             # Ignore exception?
           end
           task.rcron.send :wake_up
